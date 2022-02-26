@@ -19,9 +19,11 @@
           {% endif %}           
         </div>
         <div class="card-body">
-          {% csrf_token %}      
-          <form method="post" action="">
-            {{ form_as_p }}
+          {% if is_edit %}
+          <form method="post" action= "{% url 'posts:post_edit' post_id %}">
+            {% else %}
+          <form method="post" action="{% url 'posts:post_create' %}">
+            {% endif %}
             <input type="hidden" name="csrfmiddlewaretoken" value={{ csrf_token }}>            
             <div class="form-group row my-3 p-3">
               <label for="id_text">
@@ -37,16 +39,12 @@
               <small id="id_text-help" class="form-text text-muted">
                 Текст нового поста
               </small>                  
-            </div>            
+            </div>              
             <div class="form-group row my-3 p-3">
               <label for="id_group">
-                Group                  
+                Group
               </label>
-              <select name="group" class="form-control" id="id_group">
-                <option value="" selected>---------</option>
-                <option value="1">Группа: Лев Толстой – зеркало русской революции</option>
-              </select>
-              <small id="id_group-help" class="form-text text-muted">
+              {{ form.group }}
                 Группа, к которой будет относиться пост
               </small>
             </div>
@@ -54,7 +52,7 @@
               <button type="submit" class="btn btn-primary">
               {% if is_edit %}
                 Добавить
-              {% else %}
+              {% else %}  
                 Сохранить
               {% endif %}
               </button>

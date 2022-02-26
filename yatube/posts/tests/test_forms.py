@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -68,3 +69,48 @@ class PostCreateFormTests(TestCase):
                 text='Измененный текст'
             ).exists()
         )
+
+    def test_not_edit_post_guest(self):
+        """Guest_client не редактирует посты."""
+        post_count = Post.objects.count()
+        form_data = {
+            'text': 'Изменяем текст',
+            'group': self.group.id
+        }
+        response = self.guest_client.post(
+            reverse('posts:post_edit', args=({self.post.id})),
+            data=form_data,
+            follow=True
+        )
+        self.assertRedirects(response,
+                             f'/auth/login/?next=/posts/{self.post.id}/edit/')
+        self.assertEqual(Post.objects.count(), post_count)
+        self.assertFalse(
+            Post.objects.filter(
+                text='Изменяем текст'
+            ).exists()
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_not_create_post_guest(self):
+        """Guest_client не создает запись в Post."""
+        post_count = Post.objects.count()
+        form_data = {
+            'text': 'Тестовый текст',
+            'group': self.group.id
+        }
+        response = self.guest_client.post(
+            reverse('posts:post_create'),
+            data=form_data,
+            follow=True
+        )
+        self.assertRedirects(response,
+                             '/auth/login/?next=/create/')
+        self.assertEqual(Post.objects.count(), post_count)
+        self.assertFalse(
+            Post.objects.filter(
+                text='Тестовый текст',
+                group=self.group.id
+            ).exists()
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)

@@ -7,6 +7,9 @@ from ..models import Post
 
 from ..models import Group, Post, User
 
+PAGINATOR_NUMB = 18
+PAGE_1 = 10
+PAGE_2 = 8
 
 User = get_user_model()
 
@@ -27,6 +30,7 @@ class PaginatorViewsTest(TestCase):
                 text='Тестовая пост',
                 group=cls.group
             )
+            for i in range(PAGINATOR_NUMB)
         ])
 
     def setUp(self):
@@ -77,3 +81,41 @@ class PaginatorViewsTest(TestCase):
         self.assertEqual(task_text_0, 'Тестовая пост')
         self.assertEqual(task_author_0, 'auth')
         self.assertEqual(task_group_0, 'Тестовая группа')
+
+    def test_first_page_of_index(self):
+        """Проверка index: количество постов на первой странице равно 10."""
+        response = self.client.get(reverse('posts:index'))
+        self.assertEqual(len(response.context['page_obj']), PAGE_1)
+
+    def test_second_page_of_index(self):
+        """Проверка index: на второй странице должно быть 8 постов."""
+        response = self.client.get(reverse('posts:index') + '?page=2')
+        self.assertEqual(len(response.context['page_obj']), PAGE_2)
+
+    def test_first_page_of_group_list(self):
+        """Проверка group_list: кол-во постов на первой странице равно 10."""
+        response = self.client.get(reverse(
+            'posts:group_list', kwargs={'slug': self.group.slug}))
+        self.assertEqual(len(response.context['page_obj']), PAGE_1)
+
+    def test_second_page_of_group_list(self):
+        """ Проверка group_list: на второй странице должно быть 8 постов."""
+        response = self.client.get(reverse(
+            'posts:group_list', kwargs={'slug': self.group.slug}) + '?page=2'
+        )
+        self.assertEqual(len(response.context['page_obj']), PAGE_2)
+
+    def test_first_page_of_profile(self):
+        """ Проверка profile: кол-во постов на первой странице равно 10."""
+        response = self.client.get(reverse(
+            'posts:profile', kwargs={'username': self.user.username}
+        ))
+        self.assertEqual(len(response.context['page_obj']), PAGE_1)
+
+    def test_second_page_of_profile(self):
+        """ Проверка profile: на второй странице должно быть 8 постов."""
+        response = self.client.get(reverse(
+            'posts:profile', kwargs={'username': self.user.username})
+            + '?page=2'
+        )
+        self.assertEqual(len(response.context['page_obj']), PAGE_2)
