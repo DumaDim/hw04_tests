@@ -1,3 +1,8 @@
 # hw04_tests
+## Описание проекта
+Покрытие тестами проекта hw03_forms
+### Тестирование Models: «Unittest в Django: тестирование моделей»
 
-[![CI](https://github.com/yandex-praktikum/hw04_tests/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/yandex-praktikum/hw04_tests/actions/workflows/python-app.yml)
+Протестированы модели приложения posts в Yatube
+ 
+### Добавили в классы Post и Group метод __str__
